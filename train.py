@@ -13,7 +13,7 @@ lr = 0.001
 img_dim = [w, h]
 epochs = 10
 
-images_dir = "/Users/alpombeo/Downloads/test/"
+images_dir = "/home/aa3250/AML_PROJECT/carvana/test/"
 train_image_list = sorted(listdir(images_dir))
 
 corrupted_image = tf.placeholder(tf.float32, shape=(batchsize, w, h, 3))
@@ -65,7 +65,7 @@ with tf.Session() as sess:
                                                                corrupted_image: curr_img, produced_mask: pro_msk})
 
 
-            #k += 1
+            k += 1
 
             if k % 50 == 0:
                 print("[%d/10] [%d/6254] G Loss: %f D Loss: %f" %(e, i, g_loss, d_loss))
@@ -73,5 +73,5 @@ with tf.Session() as sess:
                     plt.figure()
                     plt.subplot(4,4,b)
                     plt.imshow(fak_img[b,:,:,:])
-                    plt.savefig("/Users/alpombeo/Documents/Docs/NYU/SEM2/AML/novel_gan/samples/sample_%d" %k)
+                    plt.savefig("/home/aa3250/AML_PROJECT/novel_gan/pixel-wise-gan/samples/sample_%d" %k)
 
