@@ -92,7 +92,7 @@ def image_generator(images_dir,
 
 def save_img(img, name):
 
-    encoded = tf.tf.image.encode_jpeg(img, name="save_me")
+    encoded = tf.image.encode_jpeg(img, name="save_me")
     f = open(name, "wb+")
     f.write(encoded.eval())
     f.close()

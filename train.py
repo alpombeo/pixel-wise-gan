@@ -37,10 +37,10 @@ generator_variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=
 discriminator_variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope="discriminator")
 
 with tf.name_scope("generator_loss"):
-    gen_loss = tf.reduce_mean(tf.log(1-produced_mask))
+    gen_loss = tf.reduce_mean(tf.log(1-produced_mask+1e-8))
 
 with tf.name_scope("discriminator_loss"):
-    dis_loss = tf.reduce_mean(mask*tf.log(1-produced_mask)) + tf.reduce_mean((1-mask)*tf.log(produced_mask))
+    dis_loss = tf.reduce_mean(mask*tf.log(1-produced_mask+1e-8)) + tf.reduce_mean((1-mask)*tf.log(produced_mask+1e-8))
 
 with tf.name_scope("train_gen"):
     train_gen = tf.train.AdamOptimizer(lrG).minimize(gen_loss, var_list=generator_variables)
