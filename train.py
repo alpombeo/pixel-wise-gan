@@ -33,7 +33,8 @@ mask = tf.placeholder(tf.float32, shape=(batchsize, w, h, 1))
 disc_input = tf.placeholder(tf.float32, shape=(batchsize, w, h, 3))
 
 fake_image = model.generator(gen_input)
-no_gan_mask, gan_mask = model.discriminator(disc_input, gen_input)
+no_gan_mask = model.discriminator(disc_input)
+gan_mask = model.discriminator(fake_image, reuse=True)
 
 generator_variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope="generator")
 discriminator_variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope="discriminator")
