@@ -5,8 +5,8 @@ from os import listdir
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--dataroot', required=True)
-parser.add_argument('--saveroot', required=True)
+parser.add_argument('--dataroot', type=str, required=True)
+parser.add_argument('--saveroot', type=str, required=True)
 parser.add_argument('--batchsize', type=int, default=8)
 parser.add_argument('--img_width', type=int, default=256)
 parser.add_argument('--img_height', type=int, default=256)
@@ -75,5 +75,5 @@ with tf.Session() as sess:
 
             if k % 50 == 0:
                 print("[%d/10] [%d/6254] G Loss: %f D Loss: %f" %(e, i, g_loss, d_loss))
-                save_img(fak_img[1, :, :, :], opt.datasave + "sample_%d" %k)
+                save_img(fak_img[1, :, :, :], opt.saveroot + "sample_%d" %k)
 
