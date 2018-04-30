@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 from keras.preprocessing.image import img_to_array, load_img
 from os.path import join
 
@@ -89,18 +90,10 @@ def image_generator(images_dir,
         yield np.array(i), np.array(m).reshape(-1, img_dim[1], img_dim[1], 1)
 
 
+def save_img(img, name):
 
-'''
-img = cv2.imread("/Users/alpombeo/Documents/Docs/NYU/SEM2/img and vid proc/CA01-2/SampleImages/Berries.jpg")
-print(img.shape)
-
-corr, mask = corrupt_img(img, center_dist="gaussian")
-
-plt.figure()
-plt.imshow(mask, cmap='gray')
-plt.figure()
-plt.imshow(corr, cmap='BrBG')
-plt.show()
-'''
-
+    encoded = tf.tf.image.encode_jpeg(img, name="save_me")
+    f = open(name, "wb+")
+    f.write(encoded.eval())
+    f.close()
 

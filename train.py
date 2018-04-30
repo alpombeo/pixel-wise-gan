@@ -1,6 +1,6 @@
 import model
 import tensorflow as tf
-from util import image_generator
+from util import image_generator, save_img
 from os import listdir
 import matplotlib
 matplotlib.use('TkAgg')
@@ -67,9 +67,5 @@ with tf.Session() as sess:
 
             if k % 50 == 0:
                 print("[%d/10] [%d/6254] G Loss: %f D Loss: %f" %(e, i, g_loss, d_loss))
-                for b in range(batchsize):
-                    plt.figure()
-                    plt.subplot(4,4,b)
-                    plt.imshow(fak_img[b,:,:,:])
-                    plt.savefig("/home/aa3250/AML_PROJECT/novel_gan/pixel-wise-gan/samples/sample_%d" %k)
+                save_img(fak_img[1, :, :, :], "/home/aa3250/AML_PROJECT/novel_gan/pixel-wise-gan/samples/sample_%d" %k)
 
