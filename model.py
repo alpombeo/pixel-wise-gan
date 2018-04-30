@@ -63,6 +63,7 @@ def up(input, residual, name, out_c, size=3, stride=2, padding="SAME"):
         strides = [1, 1, 1, 1]
 
         conv1 = tf.nn.conv2d(concat, filter1, strides, padding)
+
         relu1 = tf.nn.relu(conv1, name=name+"relu1")
         bn1 = tf.layers.batch_normalization(relu1, name=name+"bn1")
         conv2 = tf.nn.conv2d(bn1, filter2, strides, padding)

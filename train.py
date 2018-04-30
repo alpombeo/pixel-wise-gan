@@ -4,8 +4,8 @@ from util import image_generator, save_img
 from os import listdir
 
 batchsize = 16
-w = 512
-h = 512
+w = 256
+h = 256
 lr = 0.001
 img_dim = [w, h]
 epochs = 10
@@ -56,7 +56,6 @@ with tf.Session() as sess:
                                                                        gen_loss, dis_loss],
                                                                       feed_dict={corrupted_image: curr_img,
                                                                                  mask: curr_mask})
-
 
             k += 1
 
