@@ -2,13 +2,27 @@ import model
 import tensorflow as tf
 from util import image_generator, save_img
 from os import listdir
+import argparse
 
-batchsize = 16
-w = 256
-h = 256
-lr = 0.001
+parser = argparse.ArgumentParser()
+parser.add_argument('--dataroot', required=True)
+parser.add_argument('--saveroot', required=True)
+parser.add_argument('--batchsize', type=int, default=8)
+parser.add_argument('--img_width', type=int, default=256)
+parser.add_argument('--img_height', type=int, default=256)
+parser.add_argument('--lrD', type=float, default=0.001)
+parser.add_argument('--lrG', type=float, default=0.001)
+parser.add_argument('--epc', type=int, default=10)
+
+opt = parser.parse_args()
+
+batchsize = opt.batchsize
+w = opt.img_width
+h = opt.img_height
+lrD = opt.lrD
+lrG = opt.lrG
 img_dim = [w, h]
-epochs = 10
+epochs = opt.epc
 
 images_dir = "/home/aa3250/AML_PROJECT/carvana/test/"
 train_image_list = sorted(listdir(images_dir))
@@ -29,10 +43,10 @@ with tf.name_scope("discriminator_loss"):
     dis_loss = tf.reduce_mean(mask*tf.log(1-produced_mask)) + tf.reduce_mean((1-mask)*tf.log(produced_mask))
 
 with tf.name_scope("train_gen"):
-    train_gen = tf.train.AdamOptimizer(lr).minimize(gen_loss, var_list=generator_variables)
+    train_gen = tf.train.AdamOptimizer(lrG).minimize(gen_loss, var_list=generator_variables)
 
 with tf.name_scope("train_dis"):
-    train_dis = tf.train.AdamOptimizer(lr).minimize(dis_loss, var_list=discriminator_variables)
+    train_dis = tf.train.AdamOptimizer(lrD).minimize(dis_loss, var_list=discriminator_variables)
 
 with tf.name_scope("init"):
     init_op = tf.global_variables_initializer()
