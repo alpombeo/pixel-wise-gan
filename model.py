@@ -112,5 +112,5 @@ def discriminator(y, reuse=False):
         if(reuse):
             tf.get_variable_scope().reuse_variables()
 
-        return  make_unet(y)
+        return make_unet(y, 1)
 
