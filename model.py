@@ -9,11 +9,11 @@ def bottom(input, name, out_c, size=3, stride=1, padding="SAME"):
         filter2 = tf.Variable(tf.random_normal([size, size, out_c, out_c]))
         strides = [1, stride, stride, 1]
         conv1 = tf.nn.conv2d(input, filter1, strides, padding)
-        relu1 = tf.nn.relu(conv1, name="name/""relu1")
-        bn1 = tf.layers.batch_normalization(relu1)
+        relu1 = tf.nn.relu(conv1, name=name+"relu1")
+        bn1 = tf.layers.batch_normalization(relu1, name=name+"bn1")
         conv2 = tf.nn.conv2d(bn1, filter2, strides, padding)
-        relu2 = tf.nn.relu(conv2, name="name/""relu2")
-        bn2 = tf.layers.batch_normalization(relu2)
+        relu2 = tf.nn.relu(conv2, name= name + "relu2")
+        bn2 = tf.layers.batch_normalization(relu2, name=name+"bn2")
 
         return bn2
 
@@ -27,11 +27,11 @@ def down(input, name, out_c, size=3, stride=1, p_stride=2, padding="SAME", do_po
         filter2 = tf.Variable(tf.random_normal([size, size, out_c, out_c]))
         strides = [1, stride, stride, 1]
         conv1 = tf.nn.conv2d(input, filter1, strides, padding)
-        relu1 = tf.nn.relu(conv1, name="name/""relu1")
-        bn1 = tf.layers.batch_normalization(relu1)
+        relu1 = tf.nn.relu(conv1, name=name+"relu1")
+        bn1 = tf.layers.batch_normalization(relu1, name=name+"bn1")
         conv2 = tf.nn.conv2d(bn1, filter2, strides, padding)
-        relu2 = tf.nn.relu(conv2, name="name/""relu2")
-        residual = tf.layers.batch_normalization(relu2)
+        relu2 = tf.nn.relu(conv2, name=name+"relu2")
+        residual = tf.layers.batch_normalization(relu2, name=name+"bn2")
 
         if do_pool:
             p_strides = [1, p_stride, p_stride, 1]
@@ -62,45 +62,36 @@ def up(input, residual, name, out_c, size=3, stride=2, padding="SAME"):
         filter2 = tf.Variable(tf.random_normal([size, size, out_c_t, out_c]))
         strides = [1, 1, 1, 1]
 
-        conv1 = tf.nn.conv2d(input, filter1, strides, padding)
-        relu1 = tf.nn.relu(conv1, name="name/""relu1")
-        bn1 = tf.layers.batch_normalization(relu1)
+        conv1 = tf.nn.conv2d(concat, filter1, strides, padding)
+        relu1 = tf.nn.relu(conv1, name=name+"relu1")
+        bn1 = tf.layers.batch_normalization(relu1, name=name+"bn1")
         conv2 = tf.nn.conv2d(bn1, filter2, strides, padding)
-        relu2 = tf.nn.relu(conv2, name="name/""relu2")
-        bn2 = tf.layers.batch_normalization(relu2)
+        relu2 = tf.nn.relu(conv2, name=name+"relu2")
+        bn2 = tf.layers.batch_normalization(relu2, name=name+"bn2")
 
         return bn2
 
+
 def make_unet(input, out_c):
 
-    #first layer
     l1, res1 = down(input, "layer1", 64)
 
-    #second layer
     l2, res2 = down(l1, "layer2", 128)
 
-    #third layer
     l3, res3 = down(l2, "layer3", 256)
 
-    #fourth layer
     l4, res4 = down(l3, "layer3", 512)
 
-    #bottom layer
     l5 = bottom(l4, "layer5", 1024)
 
-    #sixth layer
     l6 = up(l5, res4, "layer6", 512)
 
-    #seventh layer
     l7 = up(l6, res3, "layer7", 256)
 
-    # eigth layer
     l8 = up(l7, res2, "layer8", 128)
 
-    # ninth layer
     l9 = up(l8, res1, "layer9", 64)
 
-    #output
     out = tf.layers.conv2d(l9, out_c, 1, padding="SAME", activation=tf.nn.sigmoid)
 
     return out

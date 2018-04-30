@@ -50,10 +50,8 @@ with tf.Session() as sess:
 
         for i in range(6254):
 
-
             curr_img, curr_mask = next(data_maker)
 
-            #forward pass
             d_tra, g_tra, fak_img, pro_msk, g_loss, d_loss = sess.run([train_dis, train_gen, fake_image, produced_mask,
                                                                        gen_loss, dis_loss],
                                                                       feed_dict={corrupted_image: curr_img,
