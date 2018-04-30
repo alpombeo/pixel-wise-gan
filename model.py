@@ -80,7 +80,7 @@ def make_unet(input, out_c):
 
     l3, res3 = down(l2, "layer3", 256)
 
-    l4, res4 = down(l3, "layer3", 512)
+    l4, res4 = down(l3, "layer4", 512)
 
     l5 = bottom(l4, "layer5", 1024)
 
