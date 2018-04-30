@@ -86,19 +86,19 @@ with tf.Session() as sess:
                 curr_img, curr_mask = next(data_maker)
 
                 #give real image, train discriminator
-                sess.run([train_dis_real, fake_image, no_gan_mask, dis_r_loss], feed_dict={disc_input: curr_img,
-                                                                                      mask: curr_mask})
+                _, _, _, dr_loss = sess.run([train_dis_real, fake_image, no_gan_mask, dis_r_loss],
+                                              feed_dict={disc_input: curr_img, mask: curr_mask})
 
             curr_img, curr_mask = next(data_maker)
 
             #train both
-            _, _, fak_img, pro_msk, g_loss, d_loss = sess.run([train_gen, train_dis_fake,
-                                                               fake_image, gan_mask, dis_f_loss, dis_r_loss],
+            _, _, fak_img, pro_msk, g_loss, df_loss = sess.run([train_gen, train_dis_fake,
+                                                               fake_image, gan_mask, gen_loss, dis_f_loss],
                                                               feed_dict={gen_input: curr_img})
 
             k += 1
 
             if k % 500 == 0:
-                print("[%d/10] [%d/6254] G Loss: %f D Loss: %f" %(e, i, g_loss, d_loss))
+                print("[%d/10] [%d/6254] G Loss: %f DF Loss: %f DR Loss: %f" %(e, i, g_loss, df_loss, dr_loss))
                 save_img(255*fak_img[1, :, :, :], opt.saveroot + "sample_%d.jpg" %k)
 
