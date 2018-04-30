@@ -56,13 +56,10 @@ with tf.Session() as sess:
             curr_img, curr_mask = next(data_maker)
 
             #forward pass
-            fak_img, pro_msk = sess.run([fake_image, produced_mask],
-                                        feed_dict={corrupted_image: curr_img, mask: curr_mask})
-
-            #backward pass
-            g_tra, d_tra, g_loss, d_loss = sess.run([train_gen, train_dis, gen_loss, dis_loss],
-                                                    feed_dict={fake_image: fak_img, mask: curr_mask,
-                                                               corrupted_image: curr_img, produced_mask: pro_msk})
+            d_tra, g_tra, fak_img, pro_msk, g_loss, d_loss = sess.run([train_dis, train_gen, fake_image, produced_mask,
+                                                                       gen_loss, dis_loss],
+                                                                      feed_dict={corrupted_image: curr_img,
+                                                                                 mask: curr_mask})
 
 
             k += 1
