@@ -2,9 +2,6 @@ import model
 import tensorflow as tf
 from util import image_generator, save_img
 from os import listdir
-import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
 
 batchsize = 16
 w = 512
