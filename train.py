@@ -12,6 +12,7 @@ parser.add_argument('--img_width', type=int, default=256)
 parser.add_argument('--img_height', type=int, default=256)
 parser.add_argument('--lrD', type=float, default=0.001)
 parser.add_argument('--lrG', type=float, default=0.001)
+parser.add_argument('--dstep', type=int, default=2)
 parser.add_argument('--epc', type=int, default=10)
 
 opt = parser.parse_args()
@@ -27,26 +28,43 @@ epochs = opt.epc
 images_dir = opt.dataroot
 train_image_list = sorted(listdir(images_dir))
 
-corrupted_image = tf.placeholder(tf.float32, shape=(batchsize, w, h, 3))
+gen_input = tf.placeholder(tf.float32, shape=(batchsize, w, h, 3))
 mask = tf.placeholder(tf.float32, shape=(batchsize, w, h, 1))
+disc_input = tf.placeholder(tf.float32, shape=(batchsize, w, h, 3))
 
-fake_image = model.generator(corrupted_image)
-produced_mask = model.discriminator(fake_image)
+with tf.variable_scope("generator"):
+    fake_image = model.generator(gen_input)
+
+with tf.variable_scope("discriminator"):
+    no_gan_mask = model.discriminator(disc_input)
+    scope = tf.get_variable_scope()
+    scope.reuse_variables()
+    gan_mask = model.discriminator(fake_image)
 
 generator_variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope="generator")
 discriminator_variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope="discriminator")
 
-with tf.name_scope("generator_loss"):
-    gen_loss = tf.reduce_mean(tf.log(1-produced_mask+1e-8))
+print(len(generator_variables))
+print(len(discriminator_variables))
+print(discriminator_variables)
 
-with tf.name_scope("discriminator_loss"):
-    dis_loss = tf.reduce_mean(mask*tf.log(1-produced_mask+1e-8)) + tf.reduce_mean((1-mask)*tf.log(produced_mask+1e-8))
+with tf.name_scope("generator_loss"):
+    gen_loss = -tf.reduce_mean(tf.log(gan_mask)+1e-8)
+
+with tf.name_scope("discriminator_fake_loss"):
+    dis_f_loss = -tf.reduce_mean(tf.log(1-gan_mask+1e-8))
+
+with tf.name_scope("discriminator_real_loss"):
+    dis_r_loss = -tf.reduce_mean(((1-mask)*tf.log(1-no_gan_mask+1e-8)) + (mask*tf.log(no_gan_mask+1e-8)))
 
 with tf.name_scope("train_gen"):
     train_gen = tf.train.AdamOptimizer(lrG).minimize(gen_loss, var_list=generator_variables)
 
-with tf.name_scope("train_dis"):
-    train_dis = tf.train.AdamOptimizer(lrD).minimize(dis_loss, var_list=discriminator_variables)
+with tf.name_scope("train_f_dis"):
+    train_dis_fake = tf.train.AdamOptimizer(lrD).minimize(dis_f_loss, var_list=discriminator_variables)
+
+with tf.name_scope("train_r_dis"):
+    train_dis_real = tf.train.AdamOptimizer(lrD).minimize(dis_r_loss, var_list=discriminator_variables)
 
 with tf.name_scope("init"):
     init_op = tf.global_variables_initializer()
@@ -62,18 +80,25 @@ with tf.Session() as sess:
 
     for e in range(epochs):
 
-        for i in range(6254):
+        for i in range(int(100064/batchsize)):
+
+            for s in range(opt.dstep):
+                curr_img, curr_mask = next(data_maker)
+
+                #give real image, train discriminator
+                sess.run([train_dis_real, fake_image, no_gan_mask, dis_r_loss], feed_dict={disc_input: curr_img,
+                                                                                      mask: curr_mask})
 
             curr_img, curr_mask = next(data_maker)
 
-            d_tra, g_tra, fak_img, pro_msk, g_loss, d_loss = sess.run([train_dis, train_gen, fake_image, produced_mask,
-                                                                       gen_loss, dis_loss],
-                                                                      feed_dict={corrupted_image: curr_img,
-                                                                                 mask: curr_mask})
+            #train both
+            _, _, fak_img, pro_msk, g_loss, d_loss = sess.run([train_gen, train_dis_fake,
+                                                               fake_image, gan_mask, dis_f_loss, dis_r_loss],
+                                                              feed_dict={gen_input: curr_img})
 
             k += 1
 
-            if k % 50 == 0:
+            if k % 500 == 0:
                 print("[%d/10] [%d/6254] G Loss: %f D Loss: %f" %(e, i, g_loss, d_loss))
-                save_img(fak_img[1, :, :, :], opt.saveroot + "sample_%d" %k)
+                save_img(255*fak_img[1, :, :, :], opt.saveroot + "sample_%d.jpg" %k)
 
