@@ -82,14 +82,15 @@ with tf.Session() as sess:
 
                 #give real image, train discriminator
                 _, _, _, dr_loss = sess.run([train_dis_real, fake_image, no_gan_mask, dis_r_loss],
-                                              feed_dict={disc_input: curr_img, mask: curr_mask})
+                                              feed_dict={disc_input: curr_img, mask: curr_mask, gen_input: curr_img})
 
             curr_img, curr_mask = next(data_maker)
 
             #train both
             _, _, fak_img, pro_msk, g_loss, df_loss = sess.run([train_gen, train_dis_fake,
                                                                fake_image, gan_mask, gen_loss, dis_f_loss],
-                                                              feed_dict={gen_input: curr_img})
+                                                               feed_dict={disc_input: curr_img, mask: curr_mask,
+                                                                         gen_input: curr_img})
 
             k += 1
 
