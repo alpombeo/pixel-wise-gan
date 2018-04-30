@@ -105,9 +105,14 @@ def generator(x):
         return make_unet(x, 3)
 
 
-def discriminator(y):
+def discriminator(y1, y2):
 
     with tf.variable_scope("discriminator"):
 
-        return make_unet(y, 1)
+        net1 = make_unet(y1, 1)
+        scope = tf.get_variable_scope()
+        scope.reuse_variables()
+        net2 = make_unet(y1, 1)
+
+        return net1, net2
 

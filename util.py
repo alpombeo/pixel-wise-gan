@@ -4,7 +4,7 @@ from keras.preprocessing.image import img_to_array, load_img
 from os.path import join
 
 
-def corrupt_img(img, center_num=3, center_dist = "uniform", corrupt_dist = "gaussian", ratio = 0.5, center_spread=0.3):
+def corrupt_img(img, center_num=3, center_dist="uniform", corrupt_dist="gaussian", ratio = 0.5, center_spread=0.3):
 
     img = img/np.max(img)
 
