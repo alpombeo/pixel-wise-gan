@@ -24,7 +24,7 @@ lrG = opt.lrG
 img_dim = [w, h]
 epochs = opt.epc
 
-images_dir = "/home/aa3250/AML_PROJECT/carvana/test/"
+images_dir = opt.dataroot
 train_image_list = sorted(listdir(images_dir))
 
 corrupted_image = tf.placeholder(tf.float32, shape=(batchsize, w, h, 3))
@@ -75,5 +75,5 @@ with tf.Session() as sess:
 
             if k % 50 == 0:
                 print("[%d/10] [%d/6254] G Loss: %f D Loss: %f" %(e, i, g_loss, d_loss))
-                save_img(fak_img[1, :, :, :], "/home/aa3250/AML_PROJECT/novel_gan/pixel-wise-gan/samples/sample_%d" %k)
+                save_img(fak_img[1, :, :, :], opt.datasave + "sample_%d" %k)
 
