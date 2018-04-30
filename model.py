@@ -10,10 +10,12 @@ def bottom(input, name, out_c, size=3, stride=1, padding="SAME"):
         strides = [1, stride, stride, 1]
         conv1 = tf.nn.conv2d(input, filter1, strides, padding)
         relu1 = tf.nn.relu(conv1, name="name/""relu1")
-        conv2 = tf.nn.conv2d(relu1, filter2, strides, padding)
+        bn1 = tf.layers.batch_normalization(relu1)
+        conv2 = tf.nn.conv2d(bn1, filter2, strides, padding)
         relu2 = tf.nn.relu(conv2, name="name/""relu2")
+        bn2 = tf.layers.batch_normalization(relu2)
 
-        return relu2
+        return bn2
 
 
 def down(input, name, out_c, size=3, stride=1, p_stride=2, padding="SAME", do_pool=True):
@@ -26,8 +28,10 @@ def down(input, name, out_c, size=3, stride=1, p_stride=2, padding="SAME", do_po
         strides = [1, stride, stride, 1]
         conv1 = tf.nn.conv2d(input, filter1, strides, padding)
         relu1 = tf.nn.relu(conv1, name="name/""relu1")
-        conv2 = tf.nn.conv2d(relu1, filter2, strides, padding)
-        residual = tf.nn.relu(conv2, name="name/""relu2")
+        bn1 = tf.layers.batch_normalization(relu1)
+        conv2 = tf.nn.conv2d(bn1, filter2, strides, padding)
+        relu2 = tf.nn.relu(conv2, name="name/""relu2")
+        residual = tf.layers.batch_normalization(relu2)
 
         if do_pool:
             p_strides = [1, p_stride, p_stride, 1]
@@ -58,12 +62,14 @@ def up(input, residual, name, out_c, size=3, stride=2, padding="SAME"):
         filter2 = tf.Variable(tf.random_normal([size, size, out_c_t, out_c]))
         strides = [1, 1, 1, 1]
 
-        conv1 = tf.nn.conv2d(concat, filter1, strides, padding)
+        conv1 = tf.nn.conv2d(input, filter1, strides, padding)
         relu1 = tf.nn.relu(conv1, name="name/""relu1")
-        conv2 = tf.nn.conv2d(relu1, filter2, strides, padding)
+        bn1 = tf.layers.batch_normalization(relu1)
+        conv2 = tf.nn.conv2d(bn1, filter2, strides, padding)
         relu2 = tf.nn.relu(conv2, name="name/""relu2")
+        bn2 = tf.layers.batch_normalization(relu2)
 
-        return relu2
+        return bn2
 
 def make_unet(input, out_c):
 

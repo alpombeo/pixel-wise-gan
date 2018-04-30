@@ -47,6 +47,7 @@ k = 0
 
 with tf.Session() as sess:
     sess.run(init_op)
+    print("Setup done!")
 
     for e in range(epochs):
 
